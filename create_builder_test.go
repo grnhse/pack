@@ -409,13 +409,16 @@ run-image = "some/run"
 				mockImage     *mocks.MockImage
 				savedLayers   map[string]*bytes.Buffer
 				labels        map[string]string
+				env           map[string]string
 				builderConfig pack.BuilderConfig
 			)
 
 			it.Before(func() {
 				savedLayers = make(map[string]*bytes.Buffer)
 				labels = make(map[string]string)
+				env = make(map[string]string)
 
+				// TODO : use fake image?
 				mockImage = mocks.NewMockImage(mockController)
 				mockImage.EXPECT().AddLayer(gomock.Any()).Do(func(layerPath string) {
 					file, err := os.Open(layerPath)
@@ -427,10 +430,11 @@ run-image = "some/run"
 
 					savedLayers[filepath.Base(layerPath)] = bytes.NewBuffer(buf)
 				}).AnyTimes()
-				mockImage.EXPECT().Save()
 				mockImage.EXPECT().SetLabel(gomock.Any(), gomock.Any()).Do(func(labelName, labelValue string) {
 					labels[labelName] = labelValue
 				})
+				mockImage.EXPECT().SetEnv(gomock.Any(), gomock.Any()).Do(func(key, val string) { env[key] = val }).AnyTimes()
+				mockImage.EXPECT().Save()
 
 				builderConfig = pack.BuilderConfig{
 					Repo:            mockImage,
@@ -448,6 +452,21 @@ run-image = "some/run"
 					labels["io.buildpacks.builder.metadata"],
 					`{"runImage":{"image":"myorg/run","mirrors":["gcr.io/myorg/run"]},"buildpacks":[],"groups":[]}`,
 				)
+			})
+
+			it("writes a mirrors.toml file", func() {
+				h.AssertNil(t, factory.Create(builderConfig))
+
+				content, exists := savedLayers["mirrors.tar"]
+				h.AssertEq(t, exists, true)
+				h.AssertContains(t, content.String(), "gcr.io/myorg/run")
+			})
+
+			it("writes the mirrors.toml file path to an env var", func() {
+				h.AssertNil(t, factory.Create(builderConfig))
+				content, exists := env["CNB_MIRRORS_PATH"]
+				h.AssertEq(t, exists, true)
+				h.AssertContains(t, content, "/buildpacks/mirrors.toml")
 			})
 
 			when("builder config contains buildpacks", func() {
