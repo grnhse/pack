@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"github.com/buildpack/pack/builder"
 	"io"
 	"io/ioutil"
 	"os"
@@ -12,8 +13,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	"github.com/buildpack/pack/builder"
 
 	"github.com/buildpack/lifecycle/testhelpers"
 	dockertypes "github.com/docker/docker/api/types"
@@ -215,10 +214,13 @@ func DefaultBuilderImage(t *testing.T, registryPort string) string {
 		AssertNil(t, dockerCli.ImageTag(context.Background(), origName, newName))
 		runImageName := DefaultRunImage(t, registryPort)
 
+		// TODO : possibly set user back to pack user
 		CreateImageOnLocal(t, dockerCli, newName, fmt.Sprintf(`
 					FROM %s
 					LABEL %s="{\"runImage\": {\"image\": \"%s\"}}"
-				`, origName, builder.MetadataLabel, runImageName))
+					USER root
+					RUN echo "image = \"%s\"" > /buildpacks/mirrors.toml
+				`, origName, builder.MetadataLabel, runImageName, runImageName))
 	})
 	return newName
 }

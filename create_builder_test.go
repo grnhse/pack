@@ -459,7 +459,8 @@ run-image = "some/run"
 
 				content, exists := savedLayers["mirrors.tar"]
 				h.AssertEq(t, exists, true)
-				h.AssertContains(t, content.String(), "gcr.io/myorg/run")
+				h.AssertContains(t, content.String(), `image = "myorg/run"`)
+				h.AssertContains(t, content.String(), `mirrors = ["gcr.io/myorg/run"]`)
 			})
 
 			it("writes the mirrors.toml file path to an env var", func() {

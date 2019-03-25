@@ -148,7 +148,7 @@ func (f *BuilderFactory) Create(config BuilderConfig) error {
 		return fmt.Errorf("failed to set metadata label: %s", err)
 	}
 
-	mirrorsTar, err := f.mirrorsLayer(tmpDir, config.RunImageMirrors)
+	mirrorsTar, err := f.mirrorsLayer(tmpDir, config.RunImage, config.RunImageMirrors)
 	if err != nil {
 		return fmt.Errorf(`failed to generate mirrors.toml layer: %s`, err)
 	}
@@ -156,6 +156,7 @@ func (f *BuilderFactory) Create(config BuilderConfig) error {
 		return fmt.Errorf(`failed to append mirrors.toml layer to image: %s`, err)
 	}
 
+	// TODO: Move into mirrorsLayer()
 	if err := config.Repo.SetEnv("CNB_MIRRORS_PATH", filepath.Join("/buildpacks", "mirrors.toml")); err != nil {
 		return err
 	}
@@ -194,7 +195,7 @@ func (f *BuilderFactory) orderLayer(dest string, groups []lifecycle.BuildpackGro
 	return layerTar, nil
 }
 
-func (f *BuilderFactory) mirrorsLayer(dest string, mirrors []string) (layerTar string, err error) {
+func (f *BuilderFactory) mirrorsLayer(dest string, runImage string, mirrors []string) (layerTar string, err error) {
 	bpDir := filepath.Join(dest, "buildpacks")
 	if err := os.MkdirAll(bpDir, 0755); err != nil {
 		return "", err
@@ -207,13 +208,20 @@ func (f *BuilderFactory) mirrorsLayer(dest string, mirrors []string) (layerTar s
 	defer mirrorsFile.Close()
 
 	content := struct {
+		Image   string   `toml:"image"`
 		Mirrors []string `toml:"mirrors"`
-	}{Mirrors: mirrors}
+	}{
+		Image:   runImage,
+		Mirrors: mirrors,
+	}
 	err = toml.NewEncoder(mirrorsFile).Encode(&content)
 	if err != nil {
 		return "", err
 	}
 
+	// TODO: Do we need single-file tar instead
+	// TODO : should we move this into the orderLayer function?
+	// TODO : should this tar up the entire buildpacks directory?
 	layerTar = filepath.Join(dest, "mirrors.tar")
 	if err := archive.CreateTar(layerTar, bpDir, "/buildpacks", 0, 0); err != nil {
 		return "", err

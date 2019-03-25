@@ -89,6 +89,7 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 
 		var err error
 		packHome, err = ioutil.TempDir("", "buildpack.pack.home.")
+		fmt.Println("?????????????????????????????????/", packHome)
 		h.AssertNil(t, err)
 		h.ConfigurePackHome(t, packHome, registryConfig.RunRegistryPort)
 	})
@@ -143,7 +144,7 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 				h.Run(t, packCmd("set-default-builder", h.DefaultBuilderImage(t, registryConfig.RunRegistryPort)))
 			})
 
-			it("creates image on the daemon", func() {
+			it.Focus("creates image on the daemon", func() {
 				t.Log("no previous image exists")
 				cmd := packCmd("build", repoName, "-p", "testdata/node_app/.")
 				output := h.Run(t, cmd)
@@ -691,13 +692,13 @@ func testAcceptance(t *testing.T, when spec.G, it spec.S) {
 				newBuilderTOML := strings.Replace(
 					string(builderTOMLContents),
 					"packs/build:"+h.DefaultTag,
-					h.DefaultBuildImage(t, registryConfig.RunRegistryPort),
+					"packs/build:"+h.PackTag(),
 					-1,
 				)
 				newBuilderTOML = strings.Replace(
 					string(newBuilderTOML),
 					"packs/run:"+h.DefaultTag,
-					h.DefaultRunImage(t, registryConfig.RunRegistryPort),
+					"packs/run:"+h.PackTag(),
 					-1,
 				)
 				err = ioutil.WriteFile(builderTOML, []byte(newBuilderTOML), 0777)

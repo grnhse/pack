@@ -80,7 +80,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 			})
 			h.AssertNil(t, err)
 			h.AssertEq(t, config.RunImage, "some/run")
-			h.AssertEq(t, config.LocallyConfiguredRunImage, false)
 			h.AssertEq(t, config.Builder, "some/builder")
 		})
 
@@ -99,7 +98,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 			})
 			h.AssertNil(t, err)
 			h.AssertEq(t, config.RunImage, "some/run")
-			h.AssertEq(t, config.LocallyConfiguredRunImage, false)
 			h.AssertEq(t, config.Builder, "custom/builder")
 		})
 
@@ -119,7 +117,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 			})
 			h.AssertNil(t, err)
 			h.AssertEq(t, config.RunImage, "some/run")
-			h.AssertEq(t, config.LocallyConfiguredRunImage, false)
 			h.AssertEq(t, config.Builder, "custom/builder")
 		})
 
@@ -139,7 +136,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 			})
 			h.AssertNil(t, err)
 			h.AssertEq(t, config.RunImage, "registry.com/some/run")
-			h.AssertEq(t, config.LocallyConfiguredRunImage, false)
 			h.AssertEq(t, config.Builder, "some/builder")
 		})
 
@@ -172,7 +168,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 				})
 				h.AssertNil(t, err)
 				h.AssertEq(t, config.RunImage, "registry.com/override/run")
-				h.AssertEq(t, config.LocallyConfiguredRunImage, true)
 				h.AssertEq(t, config.Builder, "some/builder")
 			})
 
@@ -185,7 +180,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 				})
 				h.AssertNil(t, err)
 				h.AssertEq(t, config.RunImage, "registry.com/override/run")
-				h.AssertEq(t, config.LocallyConfiguredRunImage, true)
 				h.AssertEq(t, config.Builder, "some/builder")
 			})
 		})
@@ -206,7 +200,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 			})
 			h.AssertNil(t, err)
 			h.AssertEq(t, config.RunImage, "some/run")
-			h.AssertEq(t, config.LocallyConfiguredRunImage, false)
 			h.AssertEq(t, config.Builder, "some/builder")
 		})
 
@@ -226,7 +219,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 			})
 			h.AssertNil(t, err)
 			h.AssertEq(t, config.RunImage, "override/run")
-			h.AssertEq(t, config.LocallyConfiguredRunImage, true)
 			h.AssertEq(t, config.Builder, "some/builder")
 		})
 
@@ -247,7 +239,6 @@ func testBuildFactory(t *testing.T, when spec.G, it spec.S) {
 			})
 			h.AssertNil(t, err)
 			h.AssertEq(t, config.RunImage, "some/run")
-			h.AssertEq(t, config.LocallyConfiguredRunImage, false)
 			h.AssertEq(t, config.Builder, "some/builder")
 			h.AssertEq(t, config.LifecycleConfig.AppDir, os.Getenv("PWD"))
 		})

@@ -144,9 +144,8 @@ func testBuilder(t *testing.T, when spec.G, it spec.S) {
  }
 }`, nil).AnyTimes()
 
-				runImage, isLocal, err := subject.GetRunImageByRepoName("gcr.io/foo/bar")
+				runImage, err := subject.GetRunImageByRepoName("gcr.io/foo/bar")
 				h.AssertNil(t, err)
-				h.AssertEq(t, isLocal, false)
 				h.AssertEq(t, runImage, "gcr.io/extra/run-image")
 			})
 		})
@@ -164,18 +163,16 @@ func testBuilder(t *testing.T, when spec.G, it spec.S) {
 
 			when("one matches the given repo", func() {
 				it("should return the local run image for the repo", func() {
-					runImage, isLocal, err := subject.GetRunImageByRepoName("gcr.io/foo/bar")
+					runImage, err := subject.GetRunImageByRepoName("gcr.io/foo/bar")
 					h.AssertNil(t, err)
-					h.AssertEq(t, isLocal, true)
 					h.AssertEq(t, runImage, "gcr.io/another/run-image")
 				})
 			})
 
 			when("none match the given repo", func() {
 				it("should return the non-local run image for the repo", func() {
-					runImage, isLocal, err := subject.GetRunImageByRepoName("some/run-image")
+					runImage, err := subject.GetRunImageByRepoName("some/run-image")
 					h.AssertNil(t, err)
-					h.AssertEq(t, isLocal, false)
 					h.AssertEq(t, runImage, "some/run-image")
 				})
 			})
@@ -183,7 +180,7 @@ func testBuilder(t *testing.T, when spec.G, it spec.S) {
 
 		when("the repo name is invalid", func() {
 			it("should err", func() {
-				_, _, err := subject.GetRunImageByRepoName("!!@@##$$%%")
+				_, err := subject.GetRunImageByRepoName("!!@@##$$%%")
 				h.AssertNotNil(t, err)
 			})
 		})
