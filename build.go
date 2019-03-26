@@ -49,6 +49,7 @@ type BuildFlags struct {
 	Publish    bool
 	NoPull     bool
 	ClearCache bool
+	CacheKey   string
 	Buildpacks []string
 }
 
