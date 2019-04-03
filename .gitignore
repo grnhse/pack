@@ -1,5 +1,5 @@
 /pack
-
+/pack-cli-*
 # Jetbrains Goland
 .idea/
 
