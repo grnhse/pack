@@ -45,12 +45,15 @@ func Build(logger *logging.Logger, fetcher pack.Fetcher) *cobra.Command {
 		Short: "Generate app image from source code",
 		RunE: logError(logger, func(cmd *cobra.Command, args []string) error {
 			buildFlags.RepoName = args[0]
+			if buildFlags.CacheKey == "" {
+				buildFlags.CacheKey = buildFlags.RepoName
+			}
 
 			dockerClient, err := docker.New()
 			if err != nil {
 				return err
 			}
-			cacheObj, err := cache.New(buildFlags.RepoName, dockerClient)
+			cacheObj, err := cache.New(buildFlags.CacheKey, dockerClient)
 			if err != nil {
 				return err
 			}
@@ -110,4 +113,5 @@ func buildCommandFlags(cmd *cobra.Command, buildFlags *pack.BuildFlags) {
 	cmd.Flags().BoolVar(&buildFlags.NoPull, "no-pull", false, "Skip pulling builder and run images before use")
 	cmd.Flags().BoolVar(&buildFlags.ClearCache, "clear-cache", false, "Clear image's associated cache before building")
 	cmd.Flags().StringSliceVar(&buildFlags.Buildpacks, "buildpack", nil, "Buildpack ID or path to a buildpack directory"+multiValueHelp("buildpack"))
+	cmd.Flags().StringVar(&buildFlags.CacheKey, "cache-key", "", "Specify key to use for image cache")
 }

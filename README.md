@@ -1,3 +1,18 @@
+# Greenhouse customizations
+
+We add an additional option to `pack build`, `--cache-key`. When
+specified, this cache key will be used to generate the pack-cache
+image instead of the docker image name.
+
+To build binaries for Linux and OSX, use the Makefile.
+
+    make
+
+We will maintain a branch `cache-key` based on an upstream release tag
+that PRs should be written against. When a new upstream release is
+available, we should rebase the `cache-key` branch onto the new
+upstream tag and create a new release for this repo from that branch.
+
 # pack - Buildpack CLI [![Travis Build Status](https://travis-ci.org/buildpack/pack.svg?branch=master)](https://travis-ci.org/buildpack/pack)
 
 **`pack`** makes it easy for
